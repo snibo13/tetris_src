@@ -28,6 +28,7 @@ function draw() {
     background(50);
     drawMatrix(arena, [0, 0]);
     drawMatrix(player.matrix, [player.x, player.y]);
+    drawMatrix(player.nextPiece, [0,0])
     if ((millis() - time) > 1000) {
         player.drop();
     }
@@ -50,15 +51,13 @@ function keyPressed() {
         }
     } else if (keyCode == UP_ARROW) {
         player.rotate();
-        while (collide(arena, player)) { // recovery
-            if (player.x < width/2) {
-              player.x++
-            }
-            else {
-              player.x--;
+        if (collide(arena, player)) { // recovery
+              player.rotate();
+              player.rotate();
+              player.rotate();
             }
         }
-    }
+
 }
 
 function drawMatrix(matrix, offset) {
@@ -166,12 +165,14 @@ function Player() {
     this.x = 0;
     this.y = 0
     this.matrix = null;
+    this.nextPiece = createPiece(Math.floor(Math.random() * 7));
     this.score = 0;
 
     this.newPiece = function () {
         this.x = (width / edge) / 2 - 1;
         this.y = 0;
-        this.matrix = createPiece(Math.floor(Math.random() * 7));
+        this.matrix = this.nextPiece;
+        this.nextPiece = createPiece(Math.floor(Math.random() * 7));
         if (collide(arena, player)) {
             for (let i = 0; i < arena.length; i++) {
                 arena[i].fill(0);
@@ -194,12 +195,6 @@ function Player() {
     this.rotate = function () {
       this.transpose();
       this.rotate90Degrees();
-        // this.matrix.reverse();
-        // for (let y = 0; y < this.matrix.length; y++) {
-        //     for (let x = y + 1; x < this.matrix[y].length; x++) {
-        //         [this.matrix[y][x], this.matrix[x][y]] = [this.matrix[x][y], this.matrix[y][x]];
-        //     }
-        // }
     }
 
     this.transpose = function () {

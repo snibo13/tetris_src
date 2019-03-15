@@ -1,14 +1,102 @@
 html, body {
-  height: 100%;
+  margin: 0;
+  padding: 0;
+  text-align:center;
+  align-content: center;
+}
+html {
+  overflow: hidden;
+}
+
+p {
+  font-family: 'Press Start 2P', cursive;
 }
 
 body {
-  margin: 0;
-  display: flex;
+  font-family: 'Press Start 2P', cursive;
+  background-size: cover;
+  height: 100%;
+  background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  background-repeat: no-repeat;
+}
 
-  /* This centers our sketch horizontally. */
-  justify-content: center;
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
 
-  /* This centers our sketch vertically. */
-  align-items: center;
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  width: 80%;
+  border-radius: 3vmin;
+}
+
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.card {
+  /* Add shadows to create the "card" effect */
+  transition: 0.3s;
+  background-color: white;
+  border-radius: 3vmin;
+}
+
+canvas {
+  display: block;
+  margin: auto;
+  padding: 7vh;
+}
+
+#paused {
+  text-align: center;
+  visibility: hidden;
+}
+
+#tetris {
+  padding: 10px;
+}
+
+#stats {
+  padding: 50px 100px;
+  float: right;
+  position: absolute;
+  right: 5vw;
+  top: 10vh;
+  text-align: center;
+  align-content: center;
+  color: #a1c4fd;
+}
+
+
+
+#stats > p {
+  padding: 5px;
+  font-size: 24px;
 }

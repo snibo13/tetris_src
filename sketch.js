@@ -1,5 +1,7 @@
-const edge = 30;
+const edge = 20;
 let time;
+let player;
+let level = 0;
 let arena = [];
 const colors = [
   {r: 232, g:  63, b:  36}, //s Piece
@@ -12,7 +14,7 @@ const colors = [
 ]
 
 function setup() {
-    createCanvas(300, 600);
+    createCanvas(edge * 10, edge * 20);
     frameRate(60);
     player = new Player();
     player.newPiece();
@@ -109,8 +111,22 @@ function arenaSweep() {
         arena.splice(y, 1);
         arena.unshift(new Array(width / edge).fill(0));
 
-        player.score += 10 * rowCount;
-        rowCount *= 2;
+        rowCount++;
+    }
+    
+    switch(rowCount) {
+        case 1:
+            player.score += 40 * (level + 1);
+            break;
+        case 2:
+            player.score += 100 * (level + 1);
+            break;
+        case 3:
+            player.score += 300 * (level + 1);
+            break;
+        case 4:
+            player.score += 1200 * (level + 1);
+            break;
     }
 }
 

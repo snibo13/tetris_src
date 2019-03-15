@@ -1,8 +1,8 @@
 //TODO: Level up mechanics
 let totalRows = 0;
-const edge = 28;
+const edge = 30;
+let rowIt = 0;
 let time;
-let gameover = false;
 let highscore = false;
 let hs = 0;
 let player;
@@ -56,7 +56,7 @@ let myFont;
 
 function setup() {
   createCanvas(10 * edge, 20 * edge);
-  frameRate(60);
+  frameRate(25  + level * 5);
   player = new Player();
   player.newPiece();
   time = millis();
@@ -68,6 +68,7 @@ function setup() {
   }
 }
 
+
 function draw() {
   background(50);
   drawMatrix(arena, [0, 0]);
@@ -76,27 +77,44 @@ function draw() {
     player.drop();
   }
 
-  if (keyIsDown(DOWN_ARROW)) {
-    player.drop();
-  }
   if(pause) {
     fill(255,255,255);
+    textSize(32);
     text('PAUSED',edge * 2.5, edge * 9);
   }
-  if(gameover) {
-    fill(255,255,255);
-    if (highscore) {
-      document.getElementById("HighscoreModal").display = "block";
-      document.getElementById("scoreField").innerHTML = hs;
+
+  function gameover () {
+    for (let x = 0; x < 10; x++) {
+      for (let y = 0; y < 20; y++) {
+        if (arena[y][x] === null) {
+          break;
+        }
+        return true;
+      }
     }
-    text('GAME OVER', edge * 2.5, edge * 9);
-    textSize(24);
-    text('Press space to continue', edge * 2.5, edge * 15);
+    return false;
+  }
+  if (player.gameover) {
+    fill(255,255,255);
+    textSize(32);
+    text('Game Over', edge * 2, edge * 9);
+    textSize(20);
+    text('Press \'C\' to continue', edge * 2, edge * 11);
+    if (newHighscore(player.score !== -1)) {
+      fill(255,255,153);
+      text('NEW HIGHSCORE!', edge * 2, edge * 7);
+      document.getElementById("HighscoreModal").visibility = 'inherit';
+    }
     noLoop();
   }
+  if (keyIsDown(DOWN_ARROW)) {
+    player.dropFast();
+  }
+
 }
 
 function keyPressed() {
+  if (!pause) {
   if (keyCode == LEFT_ARROW) {
     player.x--;
     if (collide(arena, player)) { // recovery
@@ -116,7 +134,20 @@ function keyPressed() {
         player.x--;
       }
     }
+    } else if (keyCode == 32) {
+      while(!collide(arena, player)) {
+        player.y++;
+      }
+      player.y--;
+    }
   }
+  if (keyCode == 67) {
+    player.gameover = false;
+    if (!player.gameover) {
+      loop();
+    }
+  }
+  if (!player.gameover) {
   if (keyCode == 80) {
     pause = !pause;
     if (pause) {
@@ -125,10 +156,8 @@ function keyPressed() {
       loop();
     }
   }
-
-  if(keyCode == 32) {
-    loop();
   }
+
 }
 
 function drawMatrix(matrix, offset) {
@@ -183,6 +212,11 @@ function arenaSweep() {
         rowCount++;
     }
     totalRows += rowCount;
+    rowIt += rowCount;
+    if (totalRows > 0 && (rowIt % 10) === 0) {
+      rowIt = 0;
+      level++;
+    }
     switch(rowCount) {
         case 1:
             player.score += 40 * (level + 1);
@@ -248,24 +282,28 @@ function createPiece(type) {
 
 function Player() {
   this.x = 0;
-  this.y = 0
-  this.matrix = null;
+  this.y = 0;
+  this.matrix = createPiece(Math.floor(Math.random() * 7));
+  this.nextPiece = null;
   this.score = 0;
+  this.gameover = false;
 
   this.newPiece = function() {
     this.x = 4;
     this.y = 0;
-    this.matrix = createPiece(Math.floor(Math.random() * 7));
+    this.nextPiece = createPiece(Math.floor(Math.random() * 7));
+    if(this.nextPiece == this.matrix) {
+      this.nextPiece = createPiece(Math.floor(Math.random() * 7));
+    }
+    this.matrix = this.nextPiece;
     if (collide(arena, player)) {
-      gameover = true;
       for (let i = 0; i < arena.length; i++) {
         arena[i].fill(0);
+        this.gameover = true;
       }
-      if (newHighscore(this.score) !== -1) {
-        hs = this.score;
-        highscore = true;
-      }
+
       this.score = 0;
+      totalRows = 0;
     }
     this.updateScore();
   }
@@ -281,9 +319,28 @@ function Player() {
     time = millis();
   }
 
+  this.dropFast = function() {
+    setTimeout( function() {console.log("drop")}, 1000);
+
+    this.y++;
+    if (collide(arena, this)) {
+      this.y--; // recovery
+      mergeMatrices(arena, this);
+      arenaSweep();
+      this.newPiece();
+    }
+    time = millis();
+
+  }
+
   this.rotate = function() {
-    this.transpose();
+    if (this.matrix == createPiece(3) || this.matrix == createPiece(2)) {
+      this.transpose();
+      this.rotate90Degrees();
+    } else {
     this.rotate90Degrees();
+    this.transpose();
+    }
   }
 
   this.transpose = function() {
